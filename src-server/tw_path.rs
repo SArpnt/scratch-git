@@ -25,20 +25,16 @@ pub fn turbowarp_path() -> Option<PathBuf> {
             let file_name = f.ok()?.file_name();
             file_name
                 .to_string_lossy()
-                .contains("TurboWarpDesktop")
+                .contains("ThomasWeber.TurboWarpDesktop")
                 .then(file_name)
         });
         for store_folder in store_folders {
-            let local_cache_path = packages.join(store_folder);
-            let Ok(local_cache) = local_cache_path.read_dir() else {
-                continue;
+            let config_path = packages
+                .join(store_folder)
+                .join("LocalCache/Roaming/turbowarp-desktop");
+            if config_path.is_dir() {
+                return Some(config_path);
             };
-            if local_cache.into_iter().any(|f| {
-                let file_name = f.ok()?.file_name();
-                file_name.to_string_lossy().contains("LocalCache")
-            }) {
-                return Some(local_cache_path.join("LocalCache/Roaming/turbowarp-desktop"));
-            }
         }
     }
     #[cfg(target_os = "macos")]
